@@ -11,7 +11,17 @@
             --accent-red: #d93036;
             --white: #ffffff;
         }
-        body { font-family: 'Poppins', 'Hind Vadodara', sans-serif; margin: 0; background-color: var(--primary-dark); color: var(--white); }
+        body { 
+            font-family: 'Poppins', 'Hind Vadodara', sans-serif; 
+            margin: 0; 
+            background-color: var(--primary-dark); 
+            color: var(--white); 
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        body::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, and Opera */
+        }
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--white); color: #333; }
         .brand-name { font-family: 'Hind Vadodara', sans-serif; font-weight: 700; font-size: 1.4rem; color: #000; }
         .get-started { background: #d93036; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-family: 'Poppins', sans-serif; }
