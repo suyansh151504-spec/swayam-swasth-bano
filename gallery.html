@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barot Valley Gallery</title>
+    <style>
+        body {
+            background-color: #0a1f33;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 { text-align: center; }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+        .gallery-item {
+            width: 100%;
+            height: 150px;
+            background: #1c3d5a;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #d93036;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>बारोट वैली की झलकियाँ</h2>
+    <div class="gallery-grid">
+        <!-- 10 Placeholder Images with mountain/forest theme -->
+        <div class="gallery-item"><img src="https://picsum.photos/seed/1/300/300" alt="Mountain"></div>
+        <div class="gallery-item"><img src="https://picsum.photos/seed/2/300/300" alt="Forest"></div>
+        <div class="gallery-item"><img src="https://picsum.photos/seed/3/300/300" alt="Mountain"></div>
+        <div class="gallery-item"><img src="https://picsum.photos/seed/4/300/300" alt="Forest"></div>
+        <div class="gallery-item"><img src="https://picsum.photos/seed/5/300/300" alt="Mountain"></div>
+        <div class="gallery-item"><img src="https://picsum.photos/seed/6/300/300" alt="Forest"></div>
+        <div class="gallery-item"><img src="https://picsum.photos/seed/7/300/300" alt="Mountain"></div>
+        <div class="gallery-item"><img src="https://picsum.photos/seed/8/300/300" alt="Forest"></div>
+        <div class="gallery-item"><img src="https://picsum.photos/seed/9/300/300" alt="Mountain"></div>
+        <div class="gallery-item"><img src="https://picsum.photos/seed/10/300/300" alt="Forest"></div>
+    </div>
+    <a href="index.html" class="back-link">← वापस होम पेज पर</a>
+</body>
+</html>
