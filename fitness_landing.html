@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FITPASS Clone</title>
+    <style>
+        :root {
+            --primary-dark: #0a1f33;
+            --accent-red: #d93036;
+            --white: #ffffff;
+            --text-light: #e0e0e0;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: var(--primary-dark); color: var(--white); }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--white); color: #333; }
+        .logo { font-weight: 800; font-size: 1.5rem; color: #000; display: flex; align-items: center; }
+        .get-started { background: #0056b3; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-weight: 600; }
+        .hero { padding: 20px; text-align: center; }
+        .badge { background: #1c3d5a; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; display: inline-block; }
+        h1 { margin: 10px 0; font-size: 1.8rem; }
+        .highlight { color: var(--accent-red); }
+        .carousel { width: 100%; height: 300px; background: #333; border-radius: 15px; margin: 20px 0; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .carousel img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6); }
+        .carousel-text { position: absolute; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; padding: 12px; border-radius: 5px; text-align: center; font-weight: 600; cursor: pointer; border: none; }
+        .btn-red { background: var(--accent-red); color: white; }
+        .btn-outline { border: 1px solid #4a5d6e; color: white; }
+        .section-title { font-size: 1.5rem; margin-top: 30px; padding: 0 15px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">FITPASS®</div>
+        <a href="#" class="get-started">Get Started</a>
+        <div>☰</div>
+    </header>
+
+    <div class="hero">
+        <div class="badge">One membership, Unlimited Access</div>
+        <h1>Premium Gyms & Fitness Centres in <span class="highlight">Bhopal</span></h1>
+        
+        <div class="carousel">
+            <img src="/images/carousel_chick.jpg" alt="Expert Dietician Support">
+        </div>
+
+        <p>Work out your way at fitness studios or at home with ARIA, with nutritionist support and preventive health services in Bhopal</p>
+
+        <div class="btn-group">
+            <button class="btn btn-red">Explore Studios ></button>
+            <button class="btn btn-outline">View Plans</button>
+        </div>
+    </div>
+
+    <h2 class="section-title">Fitness Activities Available</h2>
+</body>
+</html>
