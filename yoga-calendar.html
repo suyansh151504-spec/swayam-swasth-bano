@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>योग शिविर कैलेंडर</title>
+    <style>
+        body { background-color: #0a1f33; color: white; font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; width: 100%; max-width: 500px; background: #1c3d5a; padding: 15px; border-radius: 10px; }
+        .day { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; background: #0a1f33; border-radius: 5px; cursor: pointer; }
+        .day:hover { background: #d93036; }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
+        .modal-content { background: white; color: black; padding: 20px; border-radius: 10px; width: 80%; max-width: 300px; text-align: center; }
+        .back-link { color: #d93036; text-decoration: none; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← वापस होम पेज पर</a>
+    <h2>योग शिविर कैलेंडर (मई 2026)</h2>
+    <div class="calendar-grid" id="calendar"></div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <h3 id="modal-date"></h3>
+            <p id="modal-details"></p>
+            <button onclick="document.getElementById('modal').style.display='none'">बंद करें</button>
+        </div>
+    </div>
+
+    <script>
+        const calendar = document.getElementById('calendar');
+        for (let i = 1; i <= 31; i++) {
+            const day = document.createElement('div');
+            day.className = 'day';
+            day.innerText = i;
+            day.onclick = () => showDetails(i);
+            calendar.appendChild(day);
+        }
+        function showDetails(date) {
+            document.getElementById('modal-date').innerText = `दिनांक: ${date} मई 2026`;
+            document.getElementById('modal-details').innerText = date % 5 === 0 ? "विशेष योग शिविर: सुबह 6 बजे" : "नियमित सत्र: सुबह 7 बजे";
+            document.getElementById('modal').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
