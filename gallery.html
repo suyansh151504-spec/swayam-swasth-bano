@@ -5,59 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barot Valley Gallery</title>
     <style>
-        body {
-            background-color: #0a1f33;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
+        body { background-color: #0a1f33; color: white; font-family: 'Poppins', sans-serif; margin: 0; padding: 20px; }
         h2 { text-align: center; }
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            padding: 20px;
-        }
-        .gallery-item {
-            width: 100%;
-            height: 150px;
-            background: #1c3d5a;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #d93036;
-            text-decoration: none;
-        }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px; }
+        .gallery-item { width: 100%; height: 150px; background: #1c3d5a; border-radius: 10px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.2s; }
+        .gallery-item img:hover { transform: scale(1.05); }
+        #fullscreen-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        #fullscreen-overlay img { max-width: 90%; max-height: 80%; border-radius: 5px; }
+        .close-btn { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; }
+        .back-link { display: block; text-align: center; color: #d93036; text-decoration: none; }
+        .nav-btn { padding: 10px 20px; background: #d93036; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 10px; }
     </style>
 </head>
 <body>
+    <a href="index.html" class="back-link" style="text-align: left; display: block; margin-left: 20px;">← वापस होम पेज पर</a>
     <h2>बारोट वैली की झलकियाँ</h2>
-    <div class="gallery-grid">
-        <!-- 10 Placeholder Images with mountain/forest theme -->
-        <div class="gallery-item"><img src="https://picsum.photos/seed/1/300/300" alt="Mountain"></div>
-        <div class="gallery-item"><img src="https://picsum.photos/seed/2/300/300" alt="Forest"></div>
-        <div class="gallery-item"><img src="https://picsum.photos/seed/3/300/300" alt="Mountain"></div>
-        <div class="gallery-item"><img src="https://picsum.photos/seed/4/300/300" alt="Forest"></div>
-        <div class="gallery-item"><img src="https://picsum.photos/seed/5/300/300" alt="Mountain"></div>
-        <div class="gallery-item"><img src="https://picsum.photos/seed/6/300/300" alt="Forest"></div>
-        <div class="gallery-item"><img src="https://picsum.photos/seed/7/300/300" alt="Mountain"></div>
-        <div class="gallery-item"><img src="https://picsum.photos/seed/8/300/300" alt="Forest"></div>
-        <div class="gallery-item"><img src="https://picsum.photos/seed/9/300/300" alt="Mountain"></div>
-        <div class="gallery-item"><img src="https://picsum.photos/seed/10/300/300" alt="Forest"></div>
+
+    <div id="fullscreen-overlay" onclick="closeFullscreen()">
+        <span class="close-btn">&times;</span>
+        <img id="fullscreen-img" src="" alt="Full view">
     </div>
-    <a href="index.html" class="back-link">← वापस होम पेज पर</a>
+
+    <div class="gallery-grid" id="gallery-container"></div>
+
+    <div id="pagination" style="text-align: center; margin: 20px 0;">
+        <button id="prev-btn" class="nav-btn" onclick="prevPage()" style="display:none;">Previous</button>
+        <button id="next-btn" class="nav-btn" onclick="nextPage()">Next Page</button>
+    </div>
+
+    <script>
+        const images = [
+            {src: "images/barot_group.jpg", alt: "Barot Valley Group"},
+            {src: "images/barot_person.jpg", alt: "Person in Barot"},
+            {src: "images/barot_dog.jpg", alt: "Dog with flower"},
+            {src: "images/barot_waterfall.jpg", alt: "Friends at waterfall"},
+            {src: "images/barot_zipline.jpg", alt: "Ziplining"},
+            {src: "images/barot_group_trees.jpg", alt: "Group near trees"},
+            {src: "images/barot_rainbow_cloud_final.jpg", alt: "Rainbow cloud over mountains"},
+            {src: "images/barot_zipline_final.jpg", alt: "Person rappelling"}
+        ];
+        let currentPage = 1;
+        const itemsPerPage = 6;
+
+        function renderGallery() {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = '';
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedImages = images.slice(start, end);
+            
+            paginatedImages.forEach(img => {
+                container.innerHTML += `<div class="gallery-item"><img src="${img.src}" alt="${img.alt}" onclick="openFullscreen(this.src)"></div>`;
+            });
+
+            document.getElementById('prev-btn').style.display = currentPage > 1 ? 'inline-block' : 'none';
+            document.getElementById('next-btn').style.display = (currentPage * itemsPerPage) < images.length ? 'inline-block' : 'none';
+        }
+        renderGallery();
+
+        function openFullscreen(src) {
+            document.getElementById('fullscreen-img').src = src;
+            document.getElementById('fullscreen-overlay').style.display = 'flex';
+        }
+        function closeFullscreen() {
+            document.getElementById('fullscreen-overlay').style.display = 'none';
+        }
+        function nextPage() {
+            if ((currentPage * itemsPerPage) < images.length) {
+                currentPage++;
+                renderGallery();
+            }
+        }
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderGallery();
+            }
+        }
+    </script>
 </body>
 </html>
