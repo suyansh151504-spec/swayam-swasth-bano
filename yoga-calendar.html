@@ -6,77 +6,38 @@
     <title>योग शिविर कैलेंडर</title>
     <style>
         body { background-color: #0a1f33; color: white; font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .top-nav { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .top-nav { width: 100%; max-width: 500px; display: flex; justify-content: flex-start; align-items: center; margin-bottom: 20px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; width: 100%; max-width: 500px; background: #1c3d5a; padding: 15px; border-radius: 10px; }
-        .day { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; background: #0a1f33; border-radius: 5px; cursor: pointer; position: relative; }
-        .day.booked { background: #d93036; color: white; }
-        #add-form { display: none; background: white; color: black; padding: 20px; border-radius: 10px; margin-top: 20px; width: 100%; max-width: 400px; }
-        input { width: 100%; margin: 5px 0; padding: 8px; box-sizing: border-box; }
-        .event-card { background: #1c3d5a; padding: 10px; border-radius: 5px; margin-top: 10px; width: 100%; max-width: 400px; }
+        .day { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; background: #0a1f33; border-radius: 5px; }
+        .day.booked { background: #d93036; color: white; font-weight: bold; }
+        .event-card { background: #1c3d5a; padding: 15px; border-radius: 10px; margin-top: 20px; width: 100%; max-width: 400px; border-left: 5px solid #d93036; }
     </style>
 </head>
 <body>
     <div class="top-nav">
-        <a href="index.html" style="color:#d93036; text-decoration:none;">← होम</a>
-        <button onclick="toggleForm()" style="background:#d93036; border:none; color:white; padding:10px 15px; border-radius:50%; font-size:20px; cursor:pointer;">+</button>
+        <a href="index.html" style="color:#d93036; text-decoration:none; font-size: 1.1rem;">← होम</a>
     </div>
     
     <h2>मई 2026</h2>
     <div class="calendar-grid" id="calendar"></div>
 
-    <div id="add-form">
-        <h3>नया शिविर जोड़ें</h3>
-        <input type="date" id="event-date">
-        <input type="text" id="event-place" placeholder="स्थान (Place)">
-        <input type="text" id="event-duration" placeholder="अवधि (Duration)">
-        <button onclick="saveEvent()" style="background:#d93036; color:white; border:none; padding:10px; width:100%; cursor:pointer;">जोड़ें</button>
+    <div id="event-list" style="margin-top:20px; width:100%; max-width:400px;">
+        <h3>आगामी शिविर:</h3>
+        <div class="event-card">
+            <strong>15 मई 2026</strong><br>
+            स्थान: अहमदाबाद, गुजरात<br>
+            अवधि: 10 दिन
+        </div>
     </div>
 
-    <div id="event-list" style="margin-top:20px; width:100%; max-width:400px;"></div>
-
     <script>
-        let events = JSON.parse(localStorage.getItem('yogaEvents') || '{}');
-
-        function toggleForm() {
-            const form = document.getElementById('add-form');
-            form.style.display = form.style.display === 'block' ? 'none' : 'block';
+        const calendar = document.getElementById('calendar');
+        for (let i = 1; i <= 31; i++) {
+            const day = document.createElement('div');
+            day.className = 'day' + (i === 15 ? ' booked' : '');
+            day.innerText = i;
+            calendar.appendChild(day);
         }
-
-        function renderCalendar() {
-            const calendar = document.getElementById('calendar');
-            calendar.innerHTML = '';
-            for (let i = 1; i <= 31; i++) {
-                const dayStr = `2026-05-${i.toString().padStart(2, '0')}`;
-                const day = document.createElement('div');
-                day.className = 'day' + (events[dayStr] ? ' booked' : '');
-                day.innerText = i;
-                calendar.appendChild(day);
-            }
-            renderEvents();
-        }
-
-        function saveEvent() {
-            const date = document.getElementById('event-date').value;
-            const place = document.getElementById('event-place').value;
-            const duration = document.getElementById('event-duration').value;
-            if (date && place) {
-                events[date] = { place, duration };
-                localStorage.setItem('yogaEvents', JSON.stringify(events));
-                renderCalendar();
-                toggleForm();
-            }
-        }
-
-        function renderEvents() {
-            const list = document.getElementById('event-list');
-            list.innerHTML = '<h3>आगामी शिविर:</h3>';
-            Object.keys(events).sort().forEach(date => {
-                list.innerHTML += `<div class="event-card">
-                    <strong>${date}</strong>: ${events[date].place} (${events[date].duration})
-                </div>`;
-            });
-        }
-        renderCalendar();
     </script>
 </body>
 </html>
