@@ -4,39 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>योग शिविर कैलेंडर</title>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyDlyQmFpHxf8EMHCfvNeqrj3aFQPA9ZqFM",
+            authDomain: "swayam-swasth-bano-abhiyan.firebaseapp.com",
+            projectId: "swayam-swasth-bano-abhiyan",
+            storageBucket: "swayam-swasth-bano-abhiyan.appspot.com",
+            messagingSenderId: "165674386767",
+            appId: "1:165674386767:web:f540b904944d5c41467433"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
     <style>
-        body { background-color: #0a1f33; color: white; font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .top-nav { width: 100%; max-width: 500px; display: flex; justify-content: flex-start; align-items: center; margin-bottom: 20px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; width: 100%; max-width: 500px; background: #1c3d5a; padding: 15px; border-radius: 10px; }
-        .day { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; background: #0a1f33; border-radius: 5px; }
-        .day.booked { background: #d93036; color: white; font-weight: bold; }
-        .event-card { background: #1c3d5a; padding: 15px; border-radius: 10px; margin-top: 20px; width: 100%; max-width: 400px; border-left: 5px solid #d93036; }
+        body { background-color: #0a1f33; color: white; font-family: sans-serif; padding: 20px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .add-btn { background: #d93036; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: none; }
+        .calendar-container { width: 100%; max-width: 500px; margin: 0 auto; }
+        .calendar-grid { display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 8px; background: #1c3d5a; padding: 15px; border-radius: 15px; width: 100%; max-width: 500px; box-sizing: border-box; }
+        .day { aspect-ratio: 1; display: flex !important; justify-content: center; align-items: center; background: #0a1f33; border-radius: 8px; font-size: 14px; color: white; border: 1px solid #2c4d6a; transition: 0.3s; }
+        .add-btn { background: #d93036; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 28px; cursor: pointer; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .event-card { border-left: 4px solid #d93036; background: #1c3d5a; padding: 15px; border-radius: 4px; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="top-nav">
-        <a href="index.html" style="color:#d93036; text-decoration:none; font-size: 1.1rem;">← होम</a>
+        <a href="index.html" style="color:#d93036; text-decoration:none;">← होम</a>
+        <button id="add-btn" class="add-btn" onclick="document.getElementById('modal').style.display='block'">+</button>
+    </div>
+
+    <!-- Modal Form -->
+    <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; padding:20px;">
+        <div style="background:white; color:#333; padding:20px; border-radius:10px; max-width:400px; margin:50px auto;">
+            <h3>नया शिविर जोड़ें</h3>
+            <input type="text" id="event-name" placeholder="शिविर का नाम" style="width:100%; margin-bottom:10px; padding:8px;">
+            <input type="text" id="event-loc" placeholder="स्थान" style="width:100%; margin-bottom:10px; padding:8px;">
+            <input type="date" id="start-date" placeholder="आरंभ तिथि" style="width:100%; margin-bottom:10px; padding:8px;">
+            <input type="date" id="end-date" placeholder="समापन तिथि" style="width:100%; margin-bottom:10px; padding:8px;">
+            <button onclick="saveEvent()" style="background:#d93036; color:white; border:none; padding:10px 20px; border-radius:5px;">Save</button>
+            <button onclick="document.getElementById('modal').style.display='none'" style="background:#ccc; border:none; padding:10px 20px; border-radius:5px;">Cancel</button>
+        </div>
     </div>
     
     <h2>मई 2026</h2>
-    <div class="calendar-grid" id="calendar"></div>
+    <div class="calendar-container">
+        <div class="calendar-grid" id="calendar"></div>
+    </div>
 
-    <div id="event-list" style="margin-top:20px; width:100%; max-width:400px;">
+    <div id="event-list" style="margin-top:20px;">
         <h3>आगामी शिविर:</h3>
-        <div class="event-card">
-            <strong>10 मई - 19 मई 2026</strong><br>
-            स्थान: अहमदाबाद, गुजरात<br>
-            अवधि: 10 दिन
-        </div>
     </div>
 
     <script>
+        const auth = firebase.auth();
+        const addBtn = document.getElementById('add-btn');
+
+        auth.onAuthStateChanged(user => {
+            const btn = document.getElementById('add-btn');
+            if (user) {
+                btn.style.setProperty('display', 'block', 'important');
+                document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'block');
+            } else {
+                btn.style.setProperty('display', 'none', 'important');
+                document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'none');
+            }
+        });
+
         const calendar = document.getElementById('calendar');
         for (let i = 1; i <= 31; i++) {
             const day = document.createElement('div');
-            day.className = 'day' + ((i >= 10 && i <= 19) ? ' booked' : '');
+            day.className = 'day';
             day.innerText = i;
             calendar.appendChild(day);
+        }
+
+        // Initialize & Load Events
+        // Initialize & Load Events
+        const db = firebase.firestore();
+        
+        async function loadEvents() {
+            const list = document.getElementById('event-list');
+            try {
+                const snapshot = await db.collection('events').get();
+                snapshot.forEach(doc => {
+                    const event = doc.data();
+                    const card = document.createElement('div');
+                    card.className = 'event-card';
+                    card.style.display = 'flex';
+                    card.style.justifyContent = 'space-between';
+                    card.style.alignItems = 'center';
+                    
+                    card.innerHTML = `<div><strong>${event.name}</strong><br>
+                                      दिनांक: ${event.start} - ${event.end}<br>
+                                      स्थान: ${event.loc}</div>
+                                      <button class="delete-btn" onclick="deleteEvent('${doc.id}')" style="background:none; border:none; color:#d93036; font-size:20px; cursor:pointer;">🗑️</button>`;
+                    list.appendChild(card);
+                    
+                    // Check auth state for this card
+                    const user = firebase.auth().currentUser;
+                    card.querySelector('.delete-btn').style.display = user ? 'block' : 'none';
+
+                    // Highlight calendar range
+                    if (event.start && event.end) {
+                        const startDay = parseInt(event.start.split('-')[2], 10);
+                        const endDay = parseInt(event.end.split('-')[2], 10);
+                        const days = document.querySelectorAll('.day');
+                        for (let d = startDay; d <= endDay; d++) {
+                            if (days[d-1]) days[d-1].style.background = '#d93036';
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error("Firebase Error: ", err);
+            }
+        }
+        loadEvents();
+
+        function deleteEvent(id) {
+            if (confirm('क्या आप सच में इस शिविर को हटाना चाहते हैं?')) {
+                db.collection('events').doc(id).delete().then(() => {
+                    alert('हटा दिया गया!');
+                    location.reload();
+                });
+            }
+        }
+
+        function saveEvent() {
+            const name = document.getElementById('event-name').value;
+            const loc = document.getElementById('event-loc').value;
+            const start = document.getElementById('start-date').value;
+            const end = document.getElementById('end-date').value;
+            if (name && loc && start && end) {
+                db.collection('events').add({ name, loc, start, end }).then(() => {
+                    alert('Saved!');
+                    document.getElementById('modal').style.display = 'none';
+                    location.reload();
+                });
+            } else {
+                alert('कृपया सभी फ़ील्ड भरें');
+            }
         }
     </script>
 </body>

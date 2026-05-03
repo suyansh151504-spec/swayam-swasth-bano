@@ -62,9 +62,45 @@
 <body>
     <header>
         <div class="brand-name">स्वयं स्वस्थ बनो अभियान</div>
-        <a href="login.html" class="get-started">Get Started</a>
-        <div>☰</div>
+        <div id="user-display" style="display: none; align-items: center; gap: 8px; cursor: pointer; position: relative;" onclick="toggleDropdown()">
+            <span id="user-name" style="font-weight: 600; font-size: 0.9rem;"></span>
+            <span class="online-dot"></span>
+            <div id="user-dropdown" style="display: none; position: absolute; top: 30px; right: 0; background: white; color: #333; padding: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000;">
+                <div onclick="alert('Profile clicked')" style="padding: 5px; cursor: pointer;">Profile</div>
+                <div onclick="logoutUser()" style="padding: 5px; cursor: pointer; color: red;">Logout</div>
+            </div>
+        </div>
+        <a href="login.html" class="get-started" id="auth-link">Admin</a>
     </header>
+    <style>
+        .online-dot { height: 8px; width: 8px; background-color: #28a745; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(40, 167, 69, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); } }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyDlyQmFpHxf8EMHCfvNeqrj3aFQPA9ZqFM",
+            authDomain: "swayam-swasth-bano-abhiyan.firebaseapp.com",
+            projectId: "swayam-swasth-bano-abhiyan",
+            storageBucket: "swayam-swasth-bano-abhiyan.appspot.com",
+            messagingSenderId: "165674386767",
+            appId: "1:165674386767:web:f540b904944d5c41467433"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        function toggleDropdown() {
+            const dd = document.getElementById('user-dropdown');
+            dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+        }
+        function logoutUser() {
+            firebase.auth().signOut().then(() => {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            });
+        }
+    </script>
 
     <div class="hero">
         <div class="badge">गीता दीदी और दीपक भैया की पहल</div>
@@ -84,12 +120,30 @@
         </p>
 
         <div class="btn-group">
-            <a href="gallery.html" class="btn btn-red">More Barot Valley Pics ></a>
+            <a href="gallery.html" class="btn btn-red">More Barot Valley Pics</a>
             <a href="yoga-calendar.html" class="btn btn-outline">Upcoming Yoga Shivir</a>
         </div>
     </div>
 
     <script>
+        // Check login status
+        const userName = localStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('user-display').style.display = 'flex';
+            document.getElementById('user-name').innerText = userName;
+            document.getElementById('auth-link').style.display = 'none';
+            document.getElementById('add-btn-container').style.display = 'block';
+        }
+
+        function logoutUser() {
+            firebase.auth().signOut().then(() => {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            });
+        }
+
+
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
         setInterval(() => {
