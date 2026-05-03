@@ -80,14 +80,13 @@
             calendar.appendChild(day);
         }
 
-        // Initialize & Load Events
-        // Initialize & Load Events
         const db = firebase.firestore();
         
         async function loadEvents() {
             const list = document.getElementById('event-list');
             try {
                 const snapshot = await db.collection('events').get();
+                const user = firebase.auth().currentUser;
                 snapshot.forEach(doc => {
                     const event = doc.data();
                     const card = document.createElement('div');
@@ -99,15 +98,8 @@
                     card.innerHTML = `<div><strong>${event.name}</strong><br>
                                       दिनांक: ${event.start} - ${event.end}<br>
                                       स्थान: ${event.loc}</div>
-                                      <button class="delete-btn" onclick="deleteEvent('${doc.id}')" style="background:none; border:none; color:#d93036; font-size:20px; cursor:pointer;">🗑️</button>`;
+                                      <button class="delete-btn" onclick="deleteEvent('${doc.id}')" style="background:none; border:none; color:#d93036; font-size:20px; cursor:pointer; display: ${user ? 'block' : 'none'} !important;">🗑️</button>`;
                     list.appendChild(card);
-                    
-                    // Check auth state for this card
-                    const user = firebase.auth().currentUser;
-                    card.querySelector('.delete-btn').style.display = user ? 'block' : 'none';
-
-                    // Highlight calendar range
-                    if (event.start && event.end) {
                         const startDay = parseInt(event.start.split('-')[2], 10);
                         const endDay = parseInt(event.end.split('-')[2], 10);
                         const days = document.querySelectorAll('.day');
@@ -121,6 +113,16 @@
             }
         }
         loadEvents();
+
+        auth.onAuthStateChanged(user => {
+            const btn = document.getElementById('add-btn');
+            if (btn) {
+                btn.style.setProperty('display', user ? 'block' : 'none', 'important');
+            }
+            document.querySelectorAll('.delete-btn').forEach(b => {
+                b.style.setProperty('display', user ? 'block' : 'none', 'important');
+            });
+        });
 
         function deleteEvent(id) {
             if (confirm('क्या आप सच में इस शिविर को हटाना चाहते हैं?')) {
