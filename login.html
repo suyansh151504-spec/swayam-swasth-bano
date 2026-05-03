@@ -6,55 +6,88 @@
     <title>Login - स्वयं स्वस्थ बनो अभियान</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Hind+Vadodara:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Poppins', 'Hind Vadodara', sans-serif;
-            background-color: #0a1f33;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-card {
-            background: #1c3d5a;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        h2 { margin-bottom: 20px; font-family: 'Hind Vadodara', sans-serif; }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: none;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            background: #d93036;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        a { color: #ccc; text-decoration: none; display: block; margin-top: 15px; }
+        :root { --primary-dark: #0a1f33; --accent-red: #d93036; --white: #ffffff; }
+        body { font-family: 'Poppins', 'Hind Vadodara', sans-serif; background-color: var(--primary-dark); color: var(--white); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .login-card { background: #1c3d5a; padding: 40px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; }
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #0a1f33; }
+        .tab { flex: 1; padding: 10px; cursor: pointer; font-weight: 600; color: #ccc; }
+        .tab.active { color: var(--white); border-bottom: 3px solid var(--accent-red); }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; margin-top: 15px; background: var(--accent-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .hidden { display: none; }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        const auth = firebase.auth();
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            if (tab === 'login') {
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('signup-form').classList.add('hidden');
+            } else {
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('signup-form').classList.remove('hidden');
+            }
+        }
+        function loginUser() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .then((user) => {
+                    db.collection("user_details").doc(user.user.uid).get().then(doc => {
+                        localStorage.setItem('userName', doc.exists ? doc.data().name : email.split('@')[0]);
+                        window.location.href = "index.html";
+                    });
+                })
+                .catch(e => alert("लॉगिन विफल: " + e.message));
+        }
+        function signUpUser() {
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    db.collection("user_details").doc(userCredential.user.uid).set({
+                        name: name,
+                        email: email,
+                        age: null,
+                        health_problems: "",
+                        sugar: null,
+                        bp: "",
+                        kidney_problems: "",
+                        phone: ""
+                    }).then(() => {
+                        localStorage.setItem('userName', name);
+                        alert("साइन अप सफल!");
+                        window.location.href = "index.html";
+                    });
+                })
+                .catch(e => alert("साइन अप विफल: " + e.message));
+        }
+    </script>
 </head>
 <body>
     <div class="login-card">
-        <h2>प्रवेश करें</h2>
-        <input type="text" placeholder="उपयोगकर्ता नाम (Username)">
-        <input type="password" placeholder="पासवर्ड (Password)">
-        <button>Login</button>
-        <a href="index.html">← वापस होम पेज पर</a>
+        <a href="index.html" style="position: absolute; top: 20px; left: 20px; color: var(--white); text-decoration: none; font-weight: 600;">&larr; Home</a>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('login')">Login</div>
+            <div class="tab" style="pointer-events: none; color: #555;">Sign Up (Disabled)</div>
+        </div>
+        <div id="login-form">
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Password">
+            <button onclick="loginUser()">Login</button>
+        </div>
+        <div id="signup-form" class="hidden">
+            <input type="text" id="signup-name" placeholder="Name">
+            <input type="email" id="signup-email" placeholder="Email">
+            <input type="password" id="signup-password" placeholder="Password">
+            <button onclick="signUpUser()">Sign Up</button>
+        </div>
     </div>
 </body>
 </html>
