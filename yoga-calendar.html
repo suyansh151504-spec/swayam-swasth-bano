@@ -98,8 +98,11 @@
                     card.innerHTML = `<div><strong>${event.name}</strong><br>
                                       दिनांक: ${event.start} - ${event.end}<br>
                                       स्थान: ${event.loc}</div>
-                                      <button class="delete-btn" onclick="deleteEvent('${doc.id}')" style="background:none; border:none; color:#d93036; font-size:20px; cursor:pointer; display: ${user ? 'block' : 'none'} !important;">🗑️</button>`;
+                                      <button class="delete-btn" onclick="deleteEvent('${doc.id}')" style="background:none; border:none; color:#d93036; font-size:20px; cursor:pointer; display: none;">🗑️</button>`;
                     list.appendChild(card);
+                    
+                    // Highlight calendar range
+                    if (event.start && event.end) {
                         const startDay = parseInt(event.start.split('-')[2], 10);
                         const endDay = parseInt(event.end.split('-')[2], 10);
                         const days = document.querySelectorAll('.day');
