@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>योग शिविर कैलेंडर</title>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
@@ -20,35 +20,50 @@
     </script>
     <style>
         body { background-color: #0a1f33; color: white; font-family: sans-serif; padding: 20px; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a1f33; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #d93036; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .add-btn { background: #d93036; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: none; }
+        .calendar-nav { display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px; }
         .calendar-container { width: 100%; max-width: 500px; margin: 0 auto; }
         .calendar-grid { display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 8px; background: #1c3d5a; padding: 15px; border-radius: 15px; width: 100%; max-width: 500px; box-sizing: border-box; }
         .day { aspect-ratio: 1; display: flex !important; justify-content: center; align-items: center; background: #0a1f33; border-radius: 8px; font-size: 14px; color: white; border: 1px solid #2c4d6a; transition: 0.3s; }
         .add-btn { background: #d93036; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 28px; cursor: pointer; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .event-card { border-left: 4px solid #d93036; background: #1c3d5a; padding: 15px; border-radius: 4px; margin-top: 10px; }
+        .arrow-btn { background: #1c3d5a; border: 1px solid #d93036; color: white; padding: 5px 15px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
+    <div id="loader"><div class="spinner"></div></div>
     <div class="top-nav">
         <a href="index.html" style="color:#d93036; text-decoration:none;">← होम</a>
         <button id="add-btn" class="add-btn" onclick="document.getElementById('modal').style.display='block'">+</button>
     </div>
 
-    <!-- Modal Form -->
-    <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; padding:20px;">
+    <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; overflow-y:auto;">
         <div style="background:white; color:#333; padding:20px; border-radius:10px; max-width:400px; margin:50px auto;">
             <h3>नया शिविर जोड़ें</h3>
             <input type="text" id="event-name" placeholder="शिविर का नाम" style="width:100%; margin-bottom:10px; padding:8px;">
             <input type="text" id="event-loc" placeholder="स्थान" style="width:100%; margin-bottom:10px; padding:8px;">
-            <input type="date" id="start-date" placeholder="आरंभ तिथि" style="width:100%; margin-bottom:10px; padding:8px;">
-            <input type="date" id="end-date" placeholder="समापन तिथि" style="width:100%; margin-bottom:10px; padding:8px;">
+            <div style="margin-bottom:10px;">
+                <label style="font-size: 12px; color: #666;">आरंभ तिथि</label>
+                <input type="date" id="start-date" style="width:100%; padding:8px;">
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-size: 12px; color: #666;">समापन तिथि</label>
+                <input type="date" id="end-date" style="width:100%; padding:8px;">
+            </div>
             <button onclick="saveEvent()" style="background:#d93036; color:white; border:none; padding:10px 20px; border-radius:5px;">Save</button>
             <button onclick="document.getElementById('modal').style.display='none'" style="background:#ccc; border:none; padding:10px 20px; border-radius:5px;">Cancel</button>
         </div>
     </div>
-    
-    <h2>मई 2026</h2>
+
+    <div class="calendar-nav">
+        <button class="arrow-btn" onclick="changeMonth(-1)">&#9664;</button>
+        <h2 id="month-display"></h2>
+        <button class="arrow-btn" onclick="changeMonth(1)">&#9654;</button>
+    </div>
     <div class="calendar-container">
         <div class="calendar-grid" id="calendar"></div>
     </div>
@@ -59,55 +74,109 @@
 
     <script>
         const auth = firebase.auth();
-        const addBtn = document.getElementById('add-btn');
+        const db = firebase.firestore();
+
+        const style = document.createElement('style');
+        style.id = 'auth-style';
+        style.innerHTML = '.add-btn, .delete-btn { display: none !important; }';
+        document.head.appendChild(style);
 
         auth.onAuthStateChanged(user => {
             const btn = document.getElementById('add-btn');
-            if (user) {
-                btn.style.setProperty('display', 'block', 'important');
-                document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'block');
-            } else {
-                btn.style.setProperty('display', 'none', 'important');
-                document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'none');
+            if (btn) {
+                btn.style.setProperty('display', user ? 'block' : 'none', 'important');
             }
+            
+            const loader = document.getElementById('loader');
+            if (loader) loader.style.display = 'none';
+
+            renderCalendar();
         });
 
-        const calendar = document.getElementById('calendar');
-        for (let i = 1; i <= 31; i++) {
-            const day = document.createElement('div');
-            day.className = 'day';
-            day.innerText = i;
-            calendar.appendChild(day);
+        let currentMonth = new Date();
+
+        function changeMonth(offset) {
+            currentMonth.setMonth(currentMonth.getMonth() + offset);
+            renderCalendar();
         }
 
-        const db = firebase.firestore();
-        
+        function renderCalendar() {
+            const monthNames = ["जनवरी", "फरवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"];
+            document.getElementById('month-display').innerText = `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+            
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+            
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay();
+
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                calendar.appendChild(empty);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'day';
+                day.id = `day-${i}`;
+                day.innerText = i;
+                calendar.appendChild(day);
+            }
+            loadEvents(); // Re-render highlights
+        }
+
         async function loadEvents() {
             const list = document.getElementById('event-list');
+            list.innerHTML = '<h3>आगामी शिविर:</h3>';
             try {
                 const snapshot = await db.collection('events').get();
                 const user = firebase.auth().currentUser;
+                const targetMonth = currentMonth.getMonth();
+                const targetYear = currentMonth.getFullYear();
+
                 snapshot.forEach(doc => {
                     const event = doc.data();
-                    const card = document.createElement('div');
-                    card.className = 'event-card';
-                    card.style.display = 'flex';
-                    card.style.justifyContent = 'space-between';
-                    card.style.alignItems = 'center';
+                    // Split and parse safely
+                    const [sYear, sMonth, sDate] = event.start.split('-').map(Number);
+                    const [eYear, eMonth, eDate] = event.end.split('-').map(Number);
                     
-                    card.innerHTML = `<div><strong>${event.name}</strong><br>
-                                      दिनांक: ${event.start} - ${event.end}<br>
-                                      स्थान: ${event.loc}</div>
-                                      <button class="delete-btn" onclick="deleteEvent('${doc.id}')" style="background:none; border:none; color:#d93036; font-size:20px; cursor:pointer; display: none;">🗑️</button>`;
-                    list.appendChild(card);
+                    let start = new Date(sYear, sMonth - 1, sDate);
+                    let end = new Date(eYear, eMonth - 1, eDate);
+
+                    // Swap if user entered end before start
+                    if (start > end) { [start, end] = [end, start]; }
                     
-                    // Highlight calendar range
-                    if (event.start && event.end) {
-                        const startDay = parseInt(event.start.split('-')[2], 10);
-                        const endDay = parseInt(event.end.split('-')[2], 10);
-                        const days = document.querySelectorAll('.day');
+                    const monthStart = new Date(targetYear, targetMonth, 1);
+                    const monthEnd = new Date(targetYear, targetMonth + 1, 0);
+
+                    // Only render card and highlight if event overlaps with the target month
+                    if (start.getFullYear() === targetYear && start.getMonth() === targetMonth ||
+                        end.getFullYear() === targetYear && end.getMonth() === targetMonth ||
+                        (start < monthStart && end > monthEnd)) {
+                        
+                        const card = document.createElement('div');
+                        card.className = 'event-card';
+                        card.style.display = 'flex';
+                        card.style.justifyContent = 'space-between';
+                        card.style.alignItems = 'center';
+                        
+                        card.innerHTML = `<div><strong>${event.name}</strong><br>
+                                          दिनांक: ${event.start} - ${event.end}<br>
+                                          स्थान: ${event.loc}</div>
+                                          <button class="delete-btn" onclick="deleteEvent('${doc.id}')" style="display: ${user ? 'inline-block' : 'none'} !important; background:none; border:none; color:#d93036; font-size:20px; cursor:pointer;">🗑️</button>`;
+                        list.appendChild(card);
+
+                        const startDay = (start.getFullYear() === targetYear && start.getMonth() === targetMonth) ? start.getDate() : 1;
+                        const endDay = (end.getFullYear() === targetYear && end.getMonth() === targetMonth) ? end.getDate() : daysInMonth;
+                        
                         for (let d = startDay; d <= endDay; d++) {
-                            if (days[d-1]) days[d-1].style.background = '#d93036';
+                            const dEl = document.getElementById(`day-${d}`);
+                            if (dEl) {
+                                dEl.style.background = '#d93036';
+                                dEl.style.color = 'white';
+                            }
                         }
                     }
                 });
@@ -115,17 +184,6 @@
                 console.error("Firebase Error: ", err);
             }
         }
-        loadEvents();
-
-        auth.onAuthStateChanged(user => {
-            const btn = document.getElementById('add-btn');
-            if (btn) {
-                btn.style.setProperty('display', user ? 'block' : 'none', 'important');
-            }
-            document.querySelectorAll('.delete-btn').forEach(b => {
-                b.style.display = user ? 'block' : 'none';
-            });
-        });
 
         function deleteEvent(id) {
             if (confirm('क्या आप सच में इस शिविर को हटाना चाहते हैं?')) {
