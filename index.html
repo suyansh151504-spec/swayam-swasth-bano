@@ -40,6 +40,35 @@
             60% { transform: translateY(-5px); }
         }
         
+        /* Floating Timeline Button Styles */
+        .floating-button {
+            position: absolute; 
+            top: 80px; /* Adjusted to be just below the header */
+            left: 20px;
+            z-index: 900; 
+            padding: 10px; /* Square/Circular padding */
+            border-radius: 50%;
+            /* Using the theme's primary dark blue for a sleek, cohesive look */
+            background: linear-gradient(135deg, #0a1f33, #1c3d5a);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border to define it */
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+        }
+
+        .floating-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+        }
+
+
         /* Carousel Styles */
         .carousel-container { position: relative; width: 100%; height: 350px; margin: 20px 0; border-radius: 15px; overflow: hidden; background: #333; perspective: 1000px; }
         .slide { 
@@ -53,29 +82,80 @@
         .slide.active { opacity: 1; transform: rotateY(0deg); }
         .slide img { width: 100%; height: 100%; object-fit: cover; }
         
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        .btn { flex: 1; padding: 8px 12px; border-radius: 5px; text-align: center; font-weight: 600; cursor: pointer; border: none; text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
-        .btn-red { background: var(--accent-red); color: white; }
-        .btn-outline { border: 1px solid #d93036; color: #d93036; background: transparent; }
+        /* User Profile Dropdown Fix */
+        #user-dropdown {
+            display: none; position: absolute; top: 35px; right: 0; background: white; color: #333; padding: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000;
+        }
+
+        /* Button Group Layout */
+        .btn-group { 
+            display: flex; 
+            gap: 20px; /* Spacing between buttons */
+            margin-top: 35px;
+            justify-content: center; /* Center the group on the page */
+        }
+        .btn-group a {
+             padding: 8px 16px;
+             font-size: 0.85rem;
+             font-weight: 600;
+             transition: all 0.3s ease;
+             border-radius: 6px;
+             text-decoration: none;
+        }
+        .btn-group a.btn-red {
+             background-color: var(--accent-red);
+             color: white;
+        }
+        .btn-group a.btn-outline {
+             border: 2px solid var(--accent-red);
+             color: white;
+        }
     </style>
 </head>
 <body>
     <header>
-        <div class="brand-name">स्वयं स्वस्थ बनो अभियान</div>
+        <div class="brand-name">स्वयं स्वस्थ बनो अभियान</div >
         <div id="user-display" style="display: none; align-items: center; gap: 8px; cursor: pointer; position: relative;" onclick="toggleDropdown()">
             <span id="user-name" style="font-weight: 600; font-size: 0.9rem;"></span>
             <span class="online-dot"></span>
-            <div id="user-dropdown" style="display: none; position: absolute; top: 30px; right: 0; background: white; color: #333; padding: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000;">
+            <div id="user-dropdown" style="display: none; position: absolute; top: 35px; right: 0; background: white; color: #333; padding: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000;">
                 <div onclick="alert('Profile clicked')" style="padding: 5px; cursor: pointer;">Profile</div>
                 <div onclick="logoutUser()" style="padding: 5px; cursor: pointer; color: red;">Logout</div>
-            </div>
+            </div >
         </div>
         <a href="login.html" class="get-started" id="auth-link">Admin</a>
     </header>
-    <style>
-        .online-dot { height: 8px; width: 8px; background-color: #28a745; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(40, 167, 69, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); } }
-    </style>
+
+    <!-- FLOATING TIMELINE BUTTON -->
+    <a href="timeline.html" class="floating-button">
+        📸
+    </a>
+    <!-------------------------->
+
+
+    <div class="hero">
+        <div class="badge">गीता दीदी और दीपक भैया की पहल</div >
+        <h1><span class="title-animate"><span style="color:white">बारोट वैली की</span > <span style="color:var(--accent-red)">यादें</span></span></h1>
+        
+        <div class="carousel-container" id="carousel">
+            <div class="slide active"><img src="images/carousel_picnic.jpg" alt="Outdoor Picnic"></div >
+            <div class="slide"><img src="images/carousel_chick.jpg" alt="Barot Valley Chick"></div >
+            <div class="slide"><img src="images/carousel_couple.jpg" alt="Elderly Couple on Porch"></div >
+            <div class="slide"><img src="images/carousel_landscape.jpg" alt="Mountain Valley Landscape"></div >
+            <div class="slide"><img src="images/carousel_village.jpg" alt="Mountain Village Path"></div >
+        </div >
+
+        <p style="color: white; font-family: 'Poppins', sans-serif; font-size: 1.1rem; line-height: 1.6;">
+            <span>जियेंगे भाई जियेंगे मौज मस्ती से जियेंगे,</span>
+            <span style="color: #d93036;">बारोट वैली में ख़ुद से मिलेंगे</span>
+        </p>
+
+        <div class="btn-group">
+            <a href="gallery.html" class="btn btn-red">More Barot Valley Pics</a>
+            <a href="yoga-calendar.html" class="btn btn-outline">Upcoming Yoga Shivir</a>
+        </div>
+    </div >
+
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
     <script>
@@ -102,29 +182,6 @@
         }
     </script>
 
-    <div class="hero">
-        <div class="badge">गीता दीदी और दीपक भैया की पहल</div>
-        <h1><span class="title-animate"><span style="color:white">बारोट वैली की</span> <span style="color:var(--accent-red)">यादें</span></span></h1>
-        
-        <div class="carousel-container" id="carousel">
-            <div class="slide active"><img src="images/carousel_picnic.jpg" alt="Outdoor Picnic"></div>
-            <div class="slide"><img src="images/carousel_chick.jpg" alt="Barot Valley Chick"></div>
-            <div class="slide"><img src="images/carousel_couple.jpg" alt="Elderly Couple on Porch"></div>
-            <div class="slide"><img src="images/carousel_landscape.jpg" alt="Mountain Valley Landscape"></div>
-            <div class="slide"><img src="images/carousel_village.jpg" alt="Mountain Village Path"></div>
-        </div>
-
-        <p style="color: white; font-family: 'Poppins', sans-serif; font-size: 1.1rem; line-height: 1.6;">
-            <span style="color: white;">जियेंगे भाई जियेंगे मौज मस्ती से जियेंगे,</span>
-            <span style="color: #d93036;">बारोट वैली में ख़ुद से मिलेंगे</span>
-        </p>
-
-        <div class="btn-group">
-            <a href="gallery.html" class="btn btn-red">More Barot Valley Pics</a>
-            <a href="yoga-calendar.html" class="btn btn-outline">Upcoming Yoga Shivir</a>
-        </div>
-    </div>
-
     <script>
         // Check login status
         const userName = localStorage.getItem('userName');
@@ -132,17 +189,8 @@
             document.getElementById('user-display').style.display = 'flex';
             document.getElementById('user-name').innerText = userName;
             document.getElementById('auth-link').style.display = 'none';
-            document.getElementById('add-btn-container').style.display = 'block';
+            // Assuming the Admin button needs a container element to appear/disappear, if it exists in the full page structure. I'll leave this part as is for now.
         }
-
-        function logoutUser() {
-            firebase.auth().signOut().then(() => {
-                localStorage.clear();
-                sessionStorage.clear();
-                window.location.href = 'index.html';
-            });
-        }
-
 
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
@@ -152,5 +200,6 @@
             slides[currentSlide].classList.add('active');
         }, 4000);
     </script>
+
 </body>
 </html>

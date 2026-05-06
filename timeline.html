@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>स्वयं स्वस्थ बनो अभियान - Timeline</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0a1f33;
+            --accent-red: #d93036;
+            --white: #ffffff;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            margin: 0;
+            padding-bottom: 80px;
+        }
+        .container {
+            max-width: 600px; /* Slimmer, cleaner container */
+            margin: 20px auto;
+            padding: 10px;
+        }
+        header {
+            background-color: var(--accent-red); /* Using theme red */
+            padding: 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .brand-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff; /* White text for better contrast on red */
+        }
+
+        /* Story/Post Structure */
+        .timeline-card {
+            background-color: #1c3d5a; /* Matching theme dark blue cards */
+            border-radius: 12px;
+            margin-bottom: 20px;
+            padding: 15px;
+            color: #ffffff;
+        }
+
+        /* User/Profile Header */
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #555;
+        }
+        .user-info strong {
+            display: block;
+            font-size: 0.95rem;
+        }
+        .user-info span {
+            font-size: 0.75rem;
+            color: #bbb;
+        }
+
+        /* Post Content Area */
+        .post-content {
+            width: 100%;
+            height: auto;
+            max-width: 100%; /* Explicitly constrain width to parent */
+            border-radius: 8px;
+            margin-top: 10px;
+            display: block;
+            cursor: pointer;
+            box-sizing: border-box; /* Include padding/border in width */
+            object-fit: contain;
+        }
+        .post-text {
+            line-height: 1.5;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        /* Action Buttons */
+        .action-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 0 0;
+            border-top: 1px solid #335577;
+        }
+        .action-button {
+            background: none;
+            border: none;
+            color: #ddd;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand-name">स्वयं स्वस्थ बनो अभियान Timeline</div>
+    </header>
+
+    <div class="container">
+        <!-- Mock Post 1: Scenic View -->
+        <div class="timeline-card">
+            <div class="post-header">
+                <div class="profile-pic" style="display:flex; align-items:center; justify-content:center; background:#ff6b81; color:white; font-size:1.2rem;">🧘</div>
+                <div class="user-info">
+                    <strong>गीता दीदी</strong>
+                    <span>· 2 hours ago</span>
+                </div>
+            </div>
+            <p class="post-text">
+                आज बारोट वैली में एक अद्भुत सूर्यास्त का नज़ारा देखा! प्रकृति का यह आशीर्वाद है। सभी को स्वस्थ और सुरक्षित रहने की शुभकामनाएँ। ❤️🌄 #स्वयं_स्वस्थ_बनो #BarotValley
+            </p>
+            <img src="images/carousel_landscape.jpg" alt="Sunset View" class="post-content">
+
+            <div class="action-bar">
+                <button class="action-button"><span style="color: green;">👍</span> Like</button>
+                <button class="action-button"><span style="color: blue;">💬</span> Comment</button>
+                <button class="action-button"><span style="color: orange;">✈️</span> Share</button>
+            </div>
+        </div>
+
+        <!-- Mock Post 2: Event/Yoga -->
+        <div class="timeline-card">
+            <div class="post-header">
+                <div class="profile-pic" style="display:flex; align-items:center; justify-content:center; background:#ff6b81; color:white; font-size:1.2rem;">🧘</div>
+                <div class="user-info">
+                    <strong>अभियान एडमिन</strong>
+                    <span>· Yesterday</span>
+                </div>
+            </div>
+            <p class="post-text">
+                कल आयोजित योग शिविर बहुत सफल रहा। सभी प्रतिभागियों ने उत्साह और लगन दिखाई। स्वस्थ जीवनशैली अपनाना ही सबसे बड़ा उत्सव है! 💪🙏 (अगले कार्यक्रम के लिए जुड़े रहें!)
+            </p>
+             <!-- No image for variation -->
+
+            <div class="action-bar">
+                <button class="action-button"><span style="color: green;">👍</span> Like</button>
+                <button class="action-button"><span style="color: blue;">💬</span> Comment</button>
+                <button class="action-button"><span style="color: orange;">✈️</span> Share</button>
+            </div>
+        </div>
+
+         <!-- Mock Post 3: People/Community -->
+        <div class="timeline-card">
+            <div class="post-header">
+                <div class="profile-pic" style="display:flex; align-items:center; justify-content:center; background:#ff6b81; color:white; font-size:1.2rem;">🧘</div>
+                <div class="user-info">
+                    <strong>दीपक भैया</strong>
+                    <span>· 5 days ago</span>
+                </div>
+            </div>
+             <p class="post-text">
+                आज मैंने एक अद्भुत समुदाय की भावना महसूस की। यह अभियान सिर्फ स्वास्थ्य नहीं, बल्कि एकजुटता का प्रतीक है! आप सबका समर्थन अनमोल है। 😊🫂
+            </p>
+            <img src="images/carousel_couple.jpg" alt="Couple Bonding Moment" class="post-content">
+
+            <div class="action-bar">
+                <button class="action-button"><span style="color: green;">👍</span> Like</button>
+                <button class="action-button"><span style="color: blue;">💬</span> Comment</button>
+                <button class="action-button"><span style="color: orange;">✈️</span> Share</button>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
