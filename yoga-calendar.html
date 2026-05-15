@@ -76,17 +76,25 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // Dynamically inject a placeholder stylesheet (no default rules)
         const style = document.createElement('style');
         style.id = 'auth-style';
-        style.innerHTML = '.add-btn, .delete-btn { display: none !important; }';
         document.head.appendChild(style);
 
         auth.onAuthStateChanged(user => {
-            const btn = document.getElementById('add-btn');
-            if (btn) {
-                btn.style.setProperty('display', user ? 'block' : 'none', 'important');
+            // Show/hide the "add" button based on authentication status
+            const addBtn = document.getElementById('add-btn');
+            if (addBtn) {
+                addBtn.style.display = user ? 'block' : 'none';
             }
-            
+
+            // Control visibility of all delete buttons (class .delete-btn)
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(btn => {
+                btn.style.display = user ? 'inline-block' : 'none';
+            });
+
+            // Hide the loader if present
             const loader = document.getElementById('loader');
             if (loader) loader.style.display = 'none';
 

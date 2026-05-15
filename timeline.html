@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>स्वयं स्वस्थ बनो अभियान - Timeline</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -24,9 +24,13 @@
             padding: 10px;
         }
         header {
-            background-color: var(--accent-red); /* Using theme red */
-            padding: 15px;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--primary-dark);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Matching 3D Shadow effect */
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -34,7 +38,7 @@
         .brand-name {
             font-size: 1.2rem;
             font-weight: 700;
-            color: #ffffff; /* White text for better contrast on red */
+            color: var(--white);
         }
 
         /* Story/Post Structure */
@@ -59,6 +63,9 @@
             border-radius: 50%;
             object-fit: cover;
             background-color: #555;
+            background-image: url('images/geeta_profile.jpg');
+            background-size: cover;
+            background-position: center;
         }
         .user-info strong {
             display: block;
@@ -108,14 +115,30 @@
 </head>
 <body>
     <header>
+        <a href="index.html" style="color:white; text-decoration:none; font-size:1.2rem;">←</a>
         <div class="brand-name">स्वयं स्वस्थ बनो अभियान Timeline</div>
+        <button id="add-post-btn" style="display: none; background: var(--accent-red); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3);" onclick="document.getElementById('post-modal').style.display='flex'">+</button>
     </header>
 
-    <div class="container">
+    <!-- Post Creation Modal -->
+    <div id="post-modal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:var(--primary-dark); padding:20px; border-radius:15px; width:90%; max-width:400px; border:1px solid #335577;">
+            <h2 style="margin-top:0;">Create Post</h2>
+            <textarea id="post-content" placeholder="What's on your mind?" style="width:100%; height:100px; background:#1c3d5a; border:none; color:white; padding:10px; border-radius:5px; margin-bottom:20px; box-sizing:border-box;"></textarea>
+            <div style="display:flex; justify-content:space-between;">
+                <button onclick="document.getElementById('post-modal').style.display='none'" style="background:transparent; color:#bbb; border:1px solid #bbb; padding:10px 20px; border-radius:5px;">Cancel</button>
+                <button onclick="alert('Submit button clicked!'); submitPost()" style="background:var(--accent-red); color:white; border:none; padding:10px 20px; border-radius:5px;">Post</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container" id="timeline-container">
+        <!-- Posts will be injected here -->
         <!-- Mock Post 1: Scenic View -->
         <div class="timeline-card">
             <div class="post-header">
-                <div class="profile-pic" style="display:flex; align-items:center; justify-content:center; background:#ff6b81; color:white; font-size:1.2rem;">🧘</div>
+                <div class="profile-pic"></div>
                 <div class="user-info">
                     <strong>गीता दीदी</strong>
                     <span>· 2 hours ago</span>
@@ -176,5 +199,91 @@
         </div>
 
     </div>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="scripts/add_timeline_post.js"></script>
+    <script>
+        console.log("Scripts loaded. Testing db availability...");
+        if (typeof db !== 'undefined') {
+            console.log("Database initialized:", db);
+        } else {
+            console.error("Database (db) NOT initialized!");
+        }
+
+        // Check login status
+        const userName = localStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('add-post-btn').style.display = 'flex';
+        }
+
+        function submitPost() {
+            const content = document.getElementById('post-content').value;
+            const user = localStorage.getItem('userName') || 'Anonymous';
+            
+            if (!content || content.trim() === "") {
+                alert("Please enter content.");
+                return;
+            }
+            
+            db.collection("timeline_details").add({
+                post_by: user,
+                content: content,
+                image_path: "", 
+                comments: [], 
+                likes: 0,
+                creation_time: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                alert('Posted!');
+                document.getElementById('post-modal').style.display = 'none';
+                location.reload();
+            }).catch((error) => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // Load posts on page load
+        db.collection("timeline_details").orderBy("creation_time", "asc").onSnapshot(snapshot => {
+            const container = document.getElementById('timeline-container');
+            // Remove dynamically added posts but keep static ones if they are not in the list
+            // For simplicity, let's clear the container dynamic part or just append correctly
+            // To fix the order, we prepend, but we need to clear previous renders first
+            
+            // Clear only dynamic posts
+            const dynamicPosts = container.querySelectorAll('.dynamic-post');
+            dynamicPosts.forEach(el => el.remove());
+            
+            snapshot.forEach(doc => {
+                const post = doc.data();
+                const card = document.createElement('div');
+                card.className = 'timeline-card dynamic-post';
+                card.innerHTML = `
+                    <div class="post-header">
+                        <div class="profile-pic" style="display:flex; align-items:center; justify-content:center; background:#ff6b81; color:white; font-size:1.2rem;">🧘</div>
+                        <div class="user-info">
+                            <strong>${post.post_by}</strong>
+                        </div>
+                    </div>
+                    <p class="post-text">${post.content}</p>
+                    <div class="action-bar">
+                        <button class="action-button" onclick="incrementLike('${doc.id}', ${post.likes || 0})">
+                            <span style="color: green;">👍</span> <span id="like-count-${doc.id}">${post.likes || 0}</span> Like
+                        </button>
+                        <button class="action-button"><span style="color: blue;">💬</span> Comment</button>
+                    </div>
+                `;
+                container.prepend(card);
+            });
+        });
+
+        function incrementLike(postId, currentLikes) {
+            db.collection("timeline_details").doc(postId).update({
+                likes: currentLikes + 1
+            }).then(() => {
+                console.log("Liked!");
+            }).catch(e => alert("Error liking: " + e.message));
+        }
+    </script>
 </body>
 </html>

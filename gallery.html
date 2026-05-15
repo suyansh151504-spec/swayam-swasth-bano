@@ -75,12 +75,14 @@
             if ((currentPage * itemsPerPage) < images.length) {
                 currentPage++;
                 renderGallery();
+                window.scrollTo(0, 0);
             }
         }
         function prevPage() {
             if (currentPage > 1) {
                 currentPage--;
                 renderGallery();
+                window.scrollTo(0, 0);
             }
         }
     </script>
